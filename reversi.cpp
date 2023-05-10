@@ -148,7 +148,8 @@ int gewinner(const int spielfeld[GROESSE_Y][GROESSE_X])
 */
 bool aufSpielfeld(const int posX, const int posY)
 {
-    // Hier erfolgt jetzt Ihre Implementierung ...
+    if((posX < GROESSE_X && posY < GROESSE_Y) && (posX >= 0 && posY >= 0)) return true; 
+    // Prueft ob die Position innerhalb des Spielfelds ist.
     return false;
 }
 
@@ -172,7 +173,10 @@ bool zugGueltig(const int spielfeld[GROESSE_Y][GROESSE_X], const int aktuellerSp
     int gegner = 3 - aktuellerSpieler; // dasselbe wie: if aktuellerSpieler == 1 -> gegner = 2
                                        //               if aktuellerSpieler == 2 -> gegner = 1
 
-    if (spielfeld[posY][posX] != 0) // ist das Feld leer?
+    bool obereSeite = false; //
+    bool untereSeite = false; //
+
+    if (spielfeld[posY][posX] != 0) // ist das Feld leer? Wenn nein, dann kann man nicht spielen!
     {
         return false;
     }
@@ -183,9 +187,43 @@ bool zugGueltig(const int spielfeld[GROESSE_Y][GROESSE_X], const int aktuellerSp
         for (int i = -1; i <= 1; i++)
         {
             // Hier erfolgt jetzt Ihre Implementierung ...
+            if(spielfeld[posX + j][posY + i] == gegner) // das Feld ist nicht leer und es gibt an der Stelle einen gegnerischen Stein.
+            {
+                while((posX + j < GROESSE_X && posY + i < GROESSE_Y) && (posX + j >= 0 && posY + i >= 0)) // bleib im Spielfeld
+                {
+                    if(j < 0 && i < 0) // Richtung links unten
+                    {
+                        j--; 
+                        i--;
+                        if(spielfeld[posX + j][posY + i] == aktuellerSpieler)
+                            untereSeite = true;
+                    }
+                    if(j > 0 && i < 0) // Richtung links oben
+                    {
+                        j++; 
+                        i--;
+                        if(spielfeld[posX + j][posY + i] == aktuellerSpieler)
+                            obereSeite = true;
+                    }                    
+                    if(j < 0 && i > 0) // Richtung rechts unten
+                    {
+                        j--; 
+                        i++;
+                        if(spielfeld[posX + j][posY + i] == aktuellerSpieler)
+                            untereSeite = true;
+                    }
+                    if(j > 0 && i > 0) // Richtung rechts oben
+                    {
+                        j++; 
+                        i++;
+                        if(spielfeld[posX + j][posY + i] == aktuellerSpieler)
+                            obereSeite = true;
+                    }
+                }
+            }
         }
     }
-    return false;
+    return obereSeite || untereSeite; // es muss eine von den Seiten 'true' sein. also einen eigenen Stein in der Seite gefunden werden m 
 }
 
 
@@ -208,8 +246,60 @@ void zugAusfuehren(int spielfeld[GROESSE_Y][GROESSE_X], const int aktuellerSpiel
         {
             // aehnlich wie die Funktion zugGueltig(), aber stellen Sie sicher, das alle gegnerischen Steine in
             // allen Richtungen in Ihre eigenen Steine umgewandelt werden
-            //
-            // Hier erfolgt jetzt Ihre Implementierung ...
+            if(spielfeld[posX + j][posY + i] == gegner) // das Feld ist nicht leer und es gibt an der Stelle einen gegnerischen Stein.
+            {
+                while((posX + j < GROESSE_X && posY + i < GROESSE_Y) && (posX + j >= 0 && posY + i >= 0)) // bleib im Spielfeld
+                {
+                    if(j < 0 && i < 0) // Richtung links unten
+                    {
+                        j--; 
+                        i--;
+                        if(spielfeld[posX + j][posY + i] == gegner) // solange es einen gegnerischen Stein gibt, der Stein wird umgewandelt
+                            spielfeld[posX + j][posY + i] == aktuellerSpieler;
+                        else if(spielfeld[posX + j][posY + i] == 0) // falls es danach eine leere Position gefunden wird, ist die Position, wo unserer Stein hinkommt.
+                        {
+                            spielfeld[posX + j][posY + i] == aktuellerSpieler;
+                            break; // jetzt ist es fertig mit dem Zug und Break Schleife
+                        }
+                    }
+                    if(j > 0 && i < 0) // Richtung links oben
+                    {
+                        j++; 
+                        i--;
+                        if(spielfeld[posX + j][posY + i] == gegner)
+                            spielfeld[posX + j][posY + i] == aktuellerSpieler;
+                        else if(spielfeld[posX + j][posY + i] == 0)
+                        {
+                            spielfeld[posX + j][posY + i] == aktuellerSpieler;
+                            break;
+                        }
+                    }                    
+                    if(j < 0 && i > 0) // Richtung rechts unten
+                    {
+                        j--; 
+                        i++;
+                        if(spielfeld[posX + j][posY + i] == gegner)
+                            spielfeld[posX + j][posY + i] == aktuellerSpieler;
+                        else if(spielfeld[posX + j][posY + i] == 0)
+                        {
+                            spielfeld[posX + j][posY + i] == aktuellerSpieler;
+                            break;
+                        }
+                    }
+                    if(j > 0 && i > 0) // Richtung rechts oben
+                    {
+                        j++; 
+                        i++;
+                        if(spielfeld[posX + j][posY + i] == gegner)
+                            spielfeld[posX + j][posY + i] == aktuellerSpieler;
+                        else if(spielfeld[posX + j][posY + i] == 0)
+                        {
+                            spielfeld[posX + j][posY + i] == aktuellerSpieler;
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -217,9 +307,16 @@ void zugAusfuehren(int spielfeld[GROESSE_Y][GROESSE_X], const int aktuellerSpiel
 
 int moeglicheZuege(const int spielfeld[GROESSE_Y][GROESSE_X], const int aktuellerSpieler)
 {
-    // Hier erfolgt jetzt Ihre Implementierung ...
-    
-    return 0;
+    int zuegeZahl = 0;
+    for(int posX = 0; posX < GROESSE_X; posX++)
+    {
+        for(int posY = 0; posY < GROESSE_Y; posY++)
+        {
+            if(zugGueltig(spielfeld, aktuellerSpieler, posX, posY))
+                zuegeZahl++;
+        }
+    }
+    return zuegeZahl;
 }
 
 
@@ -252,7 +349,7 @@ bool menschlicherZug(int spielfeld[GROESSE_Y][GROESSE_X], const int aktuellerSpi
 
         if (zugGueltig(spielfeld, aktuellerSpieler, posX, posY))
         {
-            //accept turn;
+            // Accept turn
             break;
         }
         else
@@ -276,15 +373,35 @@ void spielen(const int spielerTyp[2])
     initialisiereSpielfeld(spielfeld);
 
     int aktuellerSpieler = 1;
+    int gegner = 2;
     zeigeSpielfeld(spielfeld);
 
     // solange noch Zuege bei einem der beiden Spieler moeglich sind
     //
-    // Hier erfolgt jetzt Ihre Implementierung ...
-    
+    while(moeglicheZuege(spielfeld, aktuellerSpieler) || moeglicheZuege(spielfeld, gegner)) // spiel weiter solange es einen möglichen Zug gibt.
+    {
+        if(menschlicherZug(spielfeld, aktuellerSpieler) && computerZug(spielfeld, gegner)) // es muessen beiden Spielern spielen
+        {
+            continue;
+        }
+        else
+            break;
+    }
+
     switch (gewinner(spielfeld))
     {
-        // Hier erfolgt jetzt Ihre Implementierung ...
+        case 0: //
+            std::cout << "Unentschieden" << std::endl;
+            break;
+        case 1: //
+            std::cout << spielerTyp[1] << " hat gewonnen!" << std::endl;
+            break;
+        case 2: //
+            std::cout << spielerTyp[2] << " hat gewonnen!" << std::endl;
+            break;
+        default: //
+            std::cout << "Error in gewinner(spielfeld) " << std::endl;
+            break;
     }
 }
 
@@ -307,14 +424,14 @@ int main()
     
     // Die folgenden drei Zeilen werden auskommentiert oder geloescht, nachdem Sie die Funktion spielen()
     // implementiert haben (waeren sonst doppelt)
-    int spielfeld[GROESSE_Y][GROESSE_X];
+    // int spielfeld[GROESSE_Y][GROESSE_X];
 
-    initialisiereSpielfeld(spielfeld);
+    // initialisiereSpielfeld(spielfeld);
 
-    zeigeSpielfeld(spielfeld);
+    // zeigeSpielfeld(spielfeld);
 
-    // int spielerTyp[2] = { COMPUTER, COMPUTER };  // Feld, das Informationen ueber den Typ des Spielers enthaelt. MENSCH(=1) oder COPMUTER(=2)
-    // spielen(spielerTyp);
+    int spielerTyp[2] = { COMPUTER, MENSCH };  // Feld, das Informationen ueber den Typ des Spielers enthaelt. MENSCH(=1) oder COPMUTER(=2)
+    spielen(spielerTyp);
     //
     // Hier erfolgt jetzt Ihre Implementierung ...
     
